@@ -1,4 +1,6 @@
-# Connection Profile PTE Conversion Tool
+# Hyperledger Fabric PTE Connection Profile Conversion Tool
+
+This is a command-line tool for converting [Hyperledger Fabric](https://www.hyperledger.org/projects/fabric) blockchain networks' connection profiles to a JSON file in a format compatible with Fabric's [Performance Traffic Engine (PTE)](https://github.com/hyperledger/fabric-test/tree/master/tools/PTE).
 
 ## Prerequisites
 
