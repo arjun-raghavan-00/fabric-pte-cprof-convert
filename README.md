@@ -19,3 +19,8 @@ _Make sure you change your working directory to the root of this repository befo
 
 The script to run to use the tool is `./convert.sh`. 
 (You can also run `node ./scripts/convert.js` for now, but a shell script wrapper has been written so that it is easier to add configuration options and other extensions in the future).
+
+## Links
+
+- [Gerrit change](https://gerrit.hyperledger.org/r/#/c/25165/)
+- [JIRA issue](https://jira.hyperledger.org/browse/FAB-11489)
