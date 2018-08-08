@@ -102,9 +102,6 @@ orgKeys.forEach(orgKey => {
       name: cpOrgCa.caName,
       url: cpOrgCa.url
     },
-    'admin_cert': null, // Default value, can change
-    priv: null, // Default value, can change
-    adminPath: null, // Default value, can change
     ordererID: ordKeys[0] // Should be indifferent to which key, there's only multiple orderers/CAs because of HA
   };
 
@@ -186,7 +183,7 @@ else {
 var outputPath = path.join(resolvedOutputDir, './pte-config.json');
 
 // Write to a file
-fs.writeFile(outputPath, JSON.stringify(pteJson), 'utf8', (err) => {
+fs.writeFile(outputPath, JSON.stringify(pteJson, null, 4), 'utf8', (err) => {
   if (err) throw err;
   else console.log(`Successfully wrote PTE configuration file to ${outputPath}`);
 });
