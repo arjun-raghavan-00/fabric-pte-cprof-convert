@@ -5,22 +5,42 @@
  */
 
 // This script takes in multiple connection profile JSON files that are expected to belong to
-//  a single network, where each connection profile JSON file is named with a prefix of `creds`.
-//  Furthermore, this script expects that ALL of the `creds*.json` files inside `../config/`
-//  belong to a single network.
+//  a single network as command line arguments to the script.
 
 'use strict';
 
-const util = require('util');
 const fs = require('fs');
 const path = require('path');
 
-// Get all filenames that start with `creds`
-var cpFilenames = fs.readdirSync(path.join(__dirname, '../config/')).filter(filename => filename.startsWith("creds"));
+// If there are no directories supplied, throw a helpful error message
+if (process.argv.length == 2) {
+  throw new Error(`
+    An input directory containing connection profile JSON files must be supplied (and an optional output
+    directory for the PTE configuration file) as shown below:
+    node ${path.basename(__filename)} <input dir> [<output dir>]
+    `);
+}
+
+var inputDir = process.argv[2],
+    resolvedInputDir;
+
+// If directory is absolute
+if (inputDir[0] === '/') resolvedInputDir = inputDir;
+// If directory is from home directory
+else if (inputDir.substring(0,1)  === '~/') resolvedInputDir = path.resolve(inputDir.substring(2));
+// Otherwise, treat directory as relative to user's working directory
+else resolvedInputDir = path.join(process.cwd(), inputDir);
+
+// No need to explicitly check if the directory exists, because the following statement will throw
+//  an error if so anyway
+var cpFilenames = fs.readdirSync(resolvedInputDir).filter(filename => filename.endsWith('.json'));
 var cpJsons = [];
 cpFilenames.forEach(filename => {
-  cpJsons.push(require('../config/' + filename)); // Push each connection profile JSON object into cpJsons
+  cpJsons.push(require(path.join(resolvedInputDir, filename)));
 });
+
+if (cpJsons.length === 0)
+  throw new Error(`No JSON files could be read`);
 
 var pteJson = {
   'test-network': {
@@ -118,7 +138,7 @@ orgKeys.forEach(orgKey => {
     org.adminPath = paths[0].substring(0, i);
   }
 
-  var cpOrgPeerKeys = peerKeys.filter(peerKey => peers[peerKey]['x-mspid'] === cpOrg.mspid );
+  var cpOrgPeerKeys = cpOrg.peers;
   cpOrgPeerKeys.forEach(peerKey => {
     var cpOrgPeer = peers[peerKey];
     var peer = {
@@ -145,7 +165,28 @@ orgKeys.forEach(orgKey => {
   pteJson['test-network'][orgKey] = org;
 });
 
-// Write to a file
 // Uncomment the line below to see output in console
-// console.log(util.inspect(pteJson, {colors: true, depth: null, maxArrayLength: null, breakLength: 100}));
-fs.writeFile(path.join(__dirname, '../output/pte-config.json'), JSON.stringify(pteJson), 'utf8', (err) => {});
+// console.log(`PTE Configuration JSON:\n${require('util').inspect(pteJson, {colors: true, depth: null, maxArrayLength: null, breakLength: 100})}`);
+
+var outputDir = process.argv[3],
+    resolvedOutputDir;
+
+// If output directory param is not specified, default to same directory as script
+if (outputDir == null)
+  resolvedOutputDir = __dirname;
+else {
+  // If directory is absolute
+  if (outputDir[0] === '/') resolvedOutputDir = outputDir;
+  // If directory is from home directory
+  else if (outputDir.substring(0,1)  === '~/') resolvedOutputDir = path.resolve(outputDir.substring(2));
+  // Otherwise, treat directory as relative to user's working directory
+  else resolvedOutputDir = path.join(process.cwd(), outputDir);
+}
+
+var outputPath = path.join(resolvedOutputDir, './pte-config.json');
+
+// Write to a file
+fs.writeFile(outputPath, JSON.stringify(pteJson), 'utf8', (err) => {
+  if (err) throw err;
+  else console.log(`Successfully wrote PTE configuration file to ${outputPath}`);
+});

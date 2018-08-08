@@ -1,31 +1,32 @@
-# Hyperledger Fabric PTE Connection Profile Conversion Tool
+# Hyperledger Fabric PTE Connection Profile Converter
 
-This is a command-line tool for converting [Hyperledger Fabric](https://www.hyperledger.org/projects/fabric) blockchain networks' connection profiles to a JSON file in a format compatible with Fabric's [Performance Traffic Engine (PTE)](https://github.com/hyperledger/fabric-test/tree/master/tools/PTE).
+This is a Node.js script for converting a [Hyperledger Fabric](https://www.hyperledger.org/projects/fabric) blockchain network's connection profile(s) to a JSON configuration file in a format compatible with Fabric's [Performance Traffic Engine (PTE)](https://github.com/hyperledger/fabric-test/tree/master/tools/PTE).
 
 ## Prerequisites
 
 * Ensure you have [Go](https://golang.org/) and [Node.js](https://nodejs.org/en/) installed on your machine.
-* Clone the `fabric-test` repository into `$GOPATH/src/github.com/hyperledger/`.
-
-## Setup
-
-_Make sure you change your working directory to the root of this repository before you run the below commands or scripts; otherwise, they won't be able to find the scripts and other files they need)._
-1. Clone this repository somewhere onto your machine and `cd` into the repo's root directory:
-    1. `cd <working directory>`
-    2. `git clone https://github.com/arjun-raghavan-00/fabric-pte-cprof-convert.git`
-    3. `cd fabric-pte-cprof-convert`
-2. If it doesn't already exist, create a directory called `./config/`.
-3. Place your network's connection profile(s) in `./config/`. These should be JSON files renamed to start with a prefix of `creds` (such as `creds0.json`).
+* Clone this repository somewhere onto your machine:
+  ```
+  git clone https://github.com/arjun-raghavan-00/fabric-pte-cprof-convert.git
+  ```
 
 ## Usage and Details
 
-The script to run to use the tool is `./convert.sh`. 
-You can also run `./node scripts/convert.js` for now, but a shell script wrapper has been written so that it is easier to add configuration options and other extensions in the future.
+The command to run the script is:
+```
+node <path to>/convert.js <input dir> <optional output dir>
+```
+`<path to>` is the path to the Node.js script, `<input dir>` is the path to the directory where your connection profile JSON files are located, and `<optional output dir>` is an optional parameter to specify a directory for the script to output the PTE configuration file.
+If an output directory is not specified, then the script will default to saving the PTE configuration file in the same directory as the script.
 
-This tool takes in a single network's connection profile(s) (it is possible that one network may have multiple connection profiles) and converts them to a single PTE configuration file for that network.
-It generates a directory named `./output/` inside `./cprof-convert/` and creates a single file named `./pte-config.json` inside `./output/`.
-This file contains the generated PTE configuration based on the information extracted from the aforementioned connection profile(s) in `./config/` (see above).
-It is important to note that the tool expects that _all_ of the connection profiles inside `./config/` are for a single network.
+The name of the output file is **`pte-config.json`**.
+
+Note that if the input or output path begins with `/` they are treated as absolute;
+if it begins with `~/` then they are treated as relative to your `$HOME` directory;
+otherwise, the script treats the paths as relative to your _working directory_ (and _not_ relative to the script itself).
+
+The script takes in a single network's connection profile(s) (it is possible that one network may have multiple connection profiles) and converts them to a single PTE configuration file for that network.
+It is important to note that the script expects that _all_ of the JSON files in the supplied input directory are connection profiles associated with a single network, so ensure that there are no other JSON files in that directory (the script will safely skip any non-JSON files it finds).
 
 ## Links
 
