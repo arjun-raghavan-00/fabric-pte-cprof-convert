@@ -1,9 +1,3 @@
-/**
- * Copyright 2018 IBM All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 // This script takes in multiple connection profile JSON files that are expected to belong to
 //  a single network as command line arguments to the script.
 
